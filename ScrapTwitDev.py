@@ -11,16 +11,16 @@ from tweepy import Stream
 from tweepy.streaming import StreamListener
 import io
 import sys
+import os
 
 #VARIABLES GLOBALES
 #Gestion des fichiers locaux
-LocalPath = "D:/Documents/_Pro/_CollectiveMakers/Formation/Python/Projet/"
 credentialsFile = 'Credentials.csv'
 dataFile = 'DataTweets.csv'
 
 #Définition des noms qualifiés des fichiers locaux
-FQdatafile = LocalPath + dataFile
-FQdataCredentials = LocalPath + credentialsFile 
+FQdatafile = os.getcwd() + '/' + dataFile
+FQdataCredentials = os.getcwd() + '/' + credentialsFile 
 
 #Réupération des credentials twitter
 credentials = open(FQdataCredentials, 'r') 
@@ -29,7 +29,6 @@ CONSUMER_SECRET = credentials.readline().strip()
 ACCESS_TOKEN = credentials.readline().strip()
 ACCESS_TOKEN_SECRET = credentials.readline().strip()
 credentials.close()
-
 
 #Définition du début de la période "d'écoute" de Twitter
 start_time = time.time()
@@ -49,7 +48,6 @@ class listener(StreamListener):
        self.limit = time_limit
        self.tweet_data = []
    def on_data(self, data):
-       saveFile = io.open(LocalPath + 'raw_tweets.json', 'a', encoding='utf-8')
        while (time.time() - self.time) < self.limit:
            try:
                print(start_time + self.limit - time.time())
