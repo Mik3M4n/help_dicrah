@@ -11,7 +11,6 @@ import io
 
 #VARIABLES GLOBALES
 #Gestion des fichiers locaux
-#dataFile = 'DataTweets.csv'
 dataFile = 'DataTweets.csv'
 dataML = 'DataML.csv'
 
@@ -30,14 +29,14 @@ with open(FQdatafile) as f :
            TweetDate = dico1['created_at']
            #print(TweetDate)
            TweetText = dico1['text']
-           print(TweetText)
+           #print(TweetText)
            dico2 = dico1['user']
            #print(dico2.keys())
            TweetUser = dico2['screen_name']
            #print(TweetUser)
            saveFile = io.open(FQdataML, 'a', encoding='utf-8')
            TweetInfo = TweetText + ',' + TweetDate + ',' + TweetUser + '\n' 
-           print(TweetInfo)
+           #print(TweetInfo)
            saveFile.write(TweetInfo)
            saveFile.close()
 
