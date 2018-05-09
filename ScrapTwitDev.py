@@ -16,7 +16,7 @@ import os
 #VARIABLES GLOBALES
 #Gestion des fichiers locaux
 credentialsFile = 'Credentials.csv'
-dataFile = 'DataTweets.csv'
+dataFile = 'DataTweets.json'
 
 #Gestion des mots-clés recherchés
 keyword_list = ['haine, race'] #track list
@@ -72,7 +72,7 @@ class listener(StreamListener):
    def on_error(self, status):
        print(status)
 
-twitterStream = Stream(auth, listener(start_time, time_limit=50))
+twitterStream = Stream(auth, listener(start_time, time_limit=60))
 twitterStream.filter(track=keyword_list, languages=['fr'])
 #twitterStream.filter(track=keyword_list, languages=['fr'])
 

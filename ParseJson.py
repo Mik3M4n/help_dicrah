@@ -11,7 +11,7 @@ import io
 
 #VARIABLES GLOBALES
 #Gestion des fichiers locaux
-dataFile = 'DataTweets.csv'
+dataFile = 'DataTweets.json'
 dataML = 'DataML.csv'
 
 
