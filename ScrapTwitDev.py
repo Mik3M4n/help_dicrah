@@ -18,6 +18,10 @@ import os
 credentialsFile = 'Credentials.csv'
 dataFile = 'DataTweets.csv'
 
+#Gestion des mots-clés recherchés
+keyword_list = ['haine, race'] #track list
+
+
 #Définition des noms qualifiés des fichiers locaux
 FQdatafile = os.getcwd() + '/' + dataFile
 FQdataCredentials = os.getcwd() + '/' + credentialsFile 
@@ -33,7 +37,6 @@ credentials.close()
 #Définition du début de la période "d'écoute" de Twitter
 start_time = time.time()
 
-keyword_list = ['twitter'] #track list
 
 #ETAPE 1 - AUTHENTIFICATION TWITTER
 auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -58,9 +61,10 @@ class listener(StreamListener):
                time.sleep(5)
                pass
        saveFile = io.open(FQdatafile, 'a', encoding='utf-8')
-       saveFile.write(u'[\n')
-       saveFile.write(','.join(self.tweet_data))
-       saveFile.write(u'\n]')
+#       saveFile.write(u'[\n')
+#       saveFile.write(','.join(self.tweet_data))
+       saveFile.write(''.join(self.tweet_data))
+#       saveFile.write(u'\n]')
        saveFile.close()
        #exit() #ne fonctionne pas
        #os._exit(0) ne fonctionne pas non plus
@@ -68,8 +72,11 @@ class listener(StreamListener):
    def on_error(self, status):
        print(status)
 
-twitterStream = Stream(auth, listener(start_time, time_limit=5))
+twitterStream = Stream(auth, listener(start_time, time_limit=50))
 twitterStream.filter(track=keyword_list, languages=['fr'])
+#twitterStream.filter(track=keyword_list, languages=['fr'])
+
+
 
 #POUR PUBLIER SUR TWITTER - (POUR INFO SEULEMENT, INUTILE DANS NOTRE CONTEXTE)
 #<status = "Testing!"
