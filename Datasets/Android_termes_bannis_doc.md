@@ -1,7 +1,7 @@
 Le fichier "Android_termes_bannis_saisie.txt" inclut les termes bannis à la saisie dans Android (version 4.4 KitKat).
   
 Séparateur : TABULATION
-Colonne "description" : valeur "e2 pour termes racistes ou homophobes
+Colonne "description" : valeur "e" pour termes racistes ou homophobes
 
 CITATION DE LA SOURCE :
 
