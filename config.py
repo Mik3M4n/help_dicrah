@@ -17,8 +17,6 @@ consumer_secret = 'gQeRqv62UjDer8d3aMMALiFYYFtPquNfoSdlLvXoSElaEq2fuL'
 access_token = '992150969604562946-uKKFTtW9a5gQ8LYOyclPPiyufmeAKvc'
 access_token_secret = 'MV9bX8zWZzGKsUaIVcaAEc0Aj57ViNAIEJNYTzEa6w108'
 
-
-
 ######
 #  Input parameters - edit these !
 ######
@@ -29,7 +27,7 @@ Verbose = True
 
 
 #  hashtags or keywords to filter the stream. Must be a list of strings
-query = ['#Casaleggio'] # a list of strings
+query = ['#DataScientest'] # a list of strings
 
 
 # Language to filter the stream.
