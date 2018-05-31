@@ -39,7 +39,6 @@ import time
 import os
 import twitter
 import urllib
-from follow_conversations import *
 
 
 ###################
@@ -132,7 +131,7 @@ class myListener(tweepy.StreamListener):
         # Once the data is written, we will return True to continue the execution, until the time limit (if any) is reached.
         # If anything goes wrong in this process, we will catch any exception, print a message on stderr,
         # put the application to sleep for five seconds, and then continue the execution by returning True again
-        
+        # data is a dictionary in unicade format
         
         while self.time_to_go > 0:
             self.new_time_to_go = self.inTime + self.time_limit - time.time()
@@ -140,11 +139,14 @@ class myListener(tweepy.StreamListener):
             try:
                 if config.Verbose and (self.time_to_go-self.new_time_to_go)>10:
                     print(" ---- %s seconds to go... " %str(self.new_time_to_go))
-                
+                    
+                data_status = twitter.Status.NewFromJsonDict(json.loads(data)) # a Status object
                 # 1 -saves tweets. Note that with 'a', every time we re-run the code 
                 # with the same query,the tweets will be appended
-                with open(self.fout_stream, 'a') as f:  
-                    f.write(data)
+                if not self._is_reply(data_status) or not self.follow_conversations: 
+                    # this "if" is to avoid double entries when we follow replies
+                    with open(self.fout_stream, 'a') as f:  
+                        f.write(data+'\n')
                 
                 # 2 - if we requested to save tweet of each user found, do that: 
                 if self.get_user_tweets: 
@@ -153,17 +155,17 @@ class myListener(tweepy.StreamListener):
                                 
                 
                 # 3. - if we requested to follow conversations, do that
-                if self.follow_conversations:
-                    data = twitter.Status.NewFromJsonDict(json.loads(data))
-                    print(type(data))
-                    if data.in_reply_to_status_id==None:
-                        tweet = data
+                
+                if self.follow_conversations or self._worth_to_follow(data_status, config.query_replies):
+                    if not self._is_reply(data_status):
+                        tweet = data_status
                     else:
-                        tweet = self._find_source(data)
-                    #if config.Verbose:
-                    #    print('Checking replies to %s' %tweet['text'])
-                    fout = '%s/replies_to_%s.jsonl' %(self.data_dir_conv, tweet.id)
-                    get_all_replies(tweet, self.api, fout, Verbose=config.Verbose)
+                        tweet = self._find_source(data_status)
+                        with open(self.fout_stream, 'a') as f:  
+                            f.write(json.dumps(tweet._json)+'\n')
+
+                    #fout = '%s/replies_to_%s.jsonl' %(self.data_dir_conv, tweet.id)
+                    self.get_all_replies(tweet, self.api, self.fout_stream, Verbose=config.Verbose)
                     
                 
                 self.time_to_go = self.new_time_to_go
@@ -191,6 +193,7 @@ class myListener(tweepy.StreamListener):
         return False
 
     
+    
     def on_error(self, status):
         # The on_error() method in particular will deal with explicit errors from Twitter
         # When using Twitter’s streaming API one must be careful of the dangers of rate limiting. 
@@ -206,7 +209,57 @@ class myListener(tweepy.StreamListener):
         else:
             sys.stderr.write("Error {}\n".format(status))
             return True
- 
+
+        
+        
+    def get_all_replies(self, tweet, api, fout, Verbose=False):
+        """ Gets all replies to one tweet (also replies-to-replies with a recursive call). Note: tweet is a Status() object """
+        user = tweet.user.screen_name
+        tweet_id = tweet.id
+        search_query = '@'+user
+        retweet_filter='-filter:retweets'
+        query = search_query+retweet_filter
+        
+        try:
+            myCursor = tweepy.Cursor(api.search, q=query, 
+                                       since_id=tweet_id, max_id=None, 
+                                       wait_on_rate_limit=True, 
+                                       wait_on_rate_limit_notify=True).items()
+        
+            rep =  [reply for reply in myCursor if reply.in_reply_to_status_id == tweet_id]
+        except tweepy.TweepError as e:
+            sys.stderr.write("Error get_all_replies: {}\n".format(e))
+            time.sleep(60+10)
+            
+
+        if len(rep) !=0:
+            if config.Verbose:
+                print('Saving replies to: %s' %tweet.text)
+            for reply in rep:
+                with open(fout, 'a+') as f:
+                    # reply is a Status object. need the json
+                    data_to_file=json.dumps(reply._json)
+                    f.write(data_to_file+'\n')
+                # recursive call to fetch replies-to-replies
+                self.get_all_replies(reply, api, fout, Verbose=False)
+
+
+
+    
+    def _worth_to_follow(self, tweet, wordList):
+        if self._is_reply(tweet) and any(word in tweet.text for word in wordList):
+            return True
+        else:
+            return False
+            
+
+    def _is_reply(self, tweet):
+        if tweet.in_reply_to_status_id==None:
+            return False
+        else:
+            return True
+
+
 
     def _find_source(self, tweet):
         """ If a tweet is a reply, find the origin of the conversation"""
@@ -265,7 +318,7 @@ def main():
     if config.Verbose:
         print('-----')
         if config.query != []:
-            print('Starting streaming for the hashtags: %s' %config.query)
+            print('Starting streaming for the query in %s' %config.query_file)
         if config.languages != []:
             print ('Languages: %s' %config.languages)
         if config.time_limit == None:
@@ -278,7 +331,7 @@ def main():
         else:
             print('Users\' tweets not requested')
         if config.follow_conversations:
-            print('Getting replies to tweets')
+            print('Getting replies to tweets and folowing conversations with target words: %s' %config.query_replies)
         else:
             print('Replies to tweets not requested')
         print('-----')

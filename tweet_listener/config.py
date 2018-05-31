@@ -22,7 +22,7 @@ Created on Mon May 14 09:30:52 2018
 
 
 # Gestion des fichiers locaux
-credentialsFile = 'Credentials.csv'
+credentialsFile = 'Credentials1.csv'
 # Modif. tirée du code d'Alex, pour ne pas montrer les credentials
 # sur le fichier et les rendre publiques sur GitHub. Il faut garder le
 # fichier 'Credentials.csv' sur la machine locale et ne pas push sur GitHub (Ed)
@@ -48,7 +48,7 @@ credentials.close()
 
 
 # Query name
-query_fname = 'prova' # Name of the output jsonl file in the folder Streams/
+query_fname = 'prova_31May' # Name of the output jsonl file in the folder Streams/
 
 
 
@@ -61,15 +61,24 @@ Verbose = True
 # hashtags populaires sur racisme. Elle peut être modifiée à tout moment,
 # car les nouvelles recherches font un append sur les données déjà scrappées (Ed)
 
-#query = ['babouin', 'babtou', 'bamboula', 'banania', 'bicot','bicotte', 'blanc-bec', 'boche', 'bosnioule', 'boucaque', 'bougnoul','bougnoule', 'boukak', 'bounioul', 'bounioule', 'bridé', 'bridée', 'caillera', 'caldoche', 'chinetoque', 'chinoir', 'chintoque','chleuh', 'crépu', 'crepu', 'crouille', 'doryphore','enturbanné', 'fatma', 'frisé', 'gnoul', 'gnoule','israélite', 'krèle', 'krele', 'macaca', 'météque', 'meteque', 'météques', 'meteques', 'mouloud', 'moulouds', 'mulâtre', 'mulatre','nègre', 'negre', 'négritude', 'negritude', 'négro', 'negro', 'néonazi','nazi', 'niaquoué', 'noiraud', 'portos', 'racaille','raton', 'rital', 'ritals', 'rosbif', 'swastika','toubab', 'youd', 'youpin', 'youpine', 'youpins', '#Racisme','#RacismeOrdinaire', 'raciste'] # a list of strings
+query_file='query_words.txt'
 
-query = ['#TuesdayThoughts']
+query = []
+with open(query_file, "r") as f:
+    for line in f:
+        query.append(line.decode('utf-8'))
+import random
+max_words = 100
+query = [ query[i] for i in sorted(random.sample(xrange(len(query)), max_words)) ]
+
+query_replies=['#Racisme','#RacismeOrdinaire', 'raciste', 'dilcrah', 'pharos', 'balancetonraciste', 'balancetonracisme' ]
+
 
 # Language to filter the stream.
-languages = ['en'] # ex. ['fr']
+languages = ['fr'] # ex. ['fr']
 
 #  Time limit in seconds.  Must be an integer or None if you don't want any 
-time_limit = 30 # an int or None 
+time_limit = 350 # an int or None 
 
 
 
@@ -77,8 +86,7 @@ time_limit = 30 # an int or None
 #
 # max_tweets_conv is the max number of tweets fetched 
 
-follow_conversations = True
-
+follow_conversations = False
 
 
 # if get_user_tweets = True, the code will save the first n_tweets
@@ -87,7 +95,6 @@ follow_conversations = True
 get_user_tweets = False
 n_tweets_user=20
 n_pages_user=1
-
 
 
 
