@@ -176,7 +176,7 @@ class myListener(tweepy.StreamListener):
                     if self._is_reply(data_status): #and self._worth_to_follow(data_status,
                                                                               #config.query_replies):
                         if config.Verbose:
-                            print('Conversation found with target word in a reply!' )
+                            print('Conversation found with target word in a reply! Text: \n %s' %data_status.text)
                         tweet = self._find_source(data_status)
                         self.get_all_replies(tweet, self.api, self.fout_stream, Verbose=config.Verbose)
              
@@ -245,7 +245,7 @@ class myListener(tweepy.StreamListener):
             
 
         if len(rep) !=0:
-            if config.Verbose:
+            if Verbose:
                 print('Saving replies to: %s' %tweet.text)
             for reply in rep:
                 with open(fout, 'a+') as f:
@@ -349,6 +349,8 @@ def main():
             print('Getting replies to tweets and folowing conversations with target words: %s' %config.query_replies)
         else:
             print('Replies to tweets not requested')
+        if config.replies_only:
+            print('Getting only conversations where a reply contains one of the words in query_replies')
         print('-----')
     
     # Stream
@@ -356,7 +358,7 @@ def main():
                               myListener(api = my_api, time_limit = config.time_limit, 
                                          get_user_tweets = config.get_user_tweets,
                                         follow_conversations = config.follow_conversations,
-                                        replies_only = self.replies_only))
+                                        replies_only = config.replies_only))
                              
     if config.replies_only:
         my_stream.filter(track = config.query_replies, languages = config.languages, async=True)
