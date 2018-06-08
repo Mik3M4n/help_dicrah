@@ -48,7 +48,7 @@ credentials.close()
 
 
 # Query name
-query_fname = 'prova_31May' # Name of the output jsonl file in the folder Streams/
+query_fname = 'prova_8jun' # Name of the output jsonl file in the folder Streams/
 
 
 
@@ -71,7 +71,7 @@ import random
 max_words = 100
 query = [ query[i] for i in sorted(random.sample(xrange(len(query)), max_words)) ]
 
-query_replies=['#Racisme','#RacismeOrdinaire', 'raciste', 'dilcrah', 'pharos', 'balancetonraciste', 'balancetonracisme' ]
+query_replies=['#Racisme','#RacismeOrdinaire', 'raciste', 'dilcrah', 'pharos', 'balancetonraciste', 'balancetonracisme']
 
 
 # Language to filter the stream.
@@ -87,6 +87,12 @@ time_limit = 350 # an int or None
 # max_tweets_conv is the max number of tweets fetched 
 
 follow_conversations = False
+
+
+# If replies_only=True, the code will check if an incoming tweet is a reply containing any of the words in query_replies; only in this case it saves the tweet
+
+replies_only = True
+
 
 
 # if get_user_tweets = True, the code will save the first n_tweets

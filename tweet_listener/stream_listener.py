@@ -85,7 +85,7 @@ def get_api(auth):
 class myListener(tweepy.StreamListener):
     
     
-    def __init__(self, api = None, time_limit = None, get_user_tweets = False, follow_conversations = False):
+    def __init__(self, api = None, time_limit = None, get_user_tweets = False, follow_conversations = False, replies_only = False):
         
         self.api = api
         self.inTime = time.time()    
@@ -103,6 +103,7 @@ class myListener(tweepy.StreamListener):
         
         self.get_user_tweets = get_user_tweets
         self.follow_conversations = follow_conversations
+        self.replies_only = replies_only
         
         if self.get_user_tweets:
             self.data_dir_users = os.getcwd()+'/Users'
@@ -137,41 +138,52 @@ class myListener(tweepy.StreamListener):
             self.new_time_to_go = self.inTime + self.time_limit - time.time()
               
             try:
+                
                 if config.Verbose and (self.time_to_go-self.new_time_to_go)>10:
                     print(" ---- %s seconds to go... " %str(self.new_time_to_go))
-                    
-                data_status = twitter.Status.NewFromJsonDict(json.loads(data)) # a Status object
-                # 1 -saves tweets. Note that with 'a', every time we re-run the code 
-                # with the same query,the tweets will be appended
-                if not self._is_reply(data_status) or not self.follow_conversations: 
-                    # this "if" is to avoid double entries when we follow replies
-                    with open(self.fout_stream, 'a') as f:  
-                        f.write(data+'\n')
                 
-                # 2 - if we requested to save tweet of each user found, do that: 
-                if self.get_user_tweets: 
-                    data = json.loads(data) # needed to have a dict (otherwise data is in unicode format)
-                    self._get_user_tweets(data, config.n_tweets_user, config.n_pages_user)
+                data_status = twitter.Status.NewFromJsonDict(json.loads(data)) # a Status object
+                 
+                # if we are interested in all incoming tweets:
+                if not self.replies_only: 
+                
+                    # 1 -saves tweets. Note that with 'a', every time we re-run the code 
+                    # with the same query,the tweets will be appended
+                    if not self._is_reply(data_status) or not self.follow_conversations: 
+                        # this "if" is to avoid double entries when we follow replies
+                        with open(self.fout_stream, 'a') as f:  
+                            f.write(data+'\n')
+                
+                    # 2 - if we requested to save tweet of each user found, do that: 
+                    if self.get_user_tweets: 
+                        data = json.loads(data) # needed to have a dict (otherwise data is in unicode format)
+                        self._get_user_tweets(data, config.n_tweets_user, config.n_pages_user)
                                 
                 
-                # 3. - if we requested to follow conversations, do that
+                    # 3. - if we requested to follow conversations, do that
                 
-                if self.follow_conversations or self._worth_to_follow(data_status, config.query_replies):
-                    if not self._is_reply(data_status):
-                        tweet = data_status
-                    else:
-                        tweet = self._find_source(data_status)
-                        with open(self.fout_stream, 'a') as f:  
-                            f.write(json.dumps(tweet._json)+'\n')
+                    if self.follow_conversations or self._worth_to_follow(data_status, config.query_replies):
+                        if not self._is_reply(data_status):
+                            tweet = data_status
+                        else:
+                            tweet = self._find_source(data_status)
 
-                    #fout = '%s/replies_to_%s.jsonl' %(self.data_dir_conv, tweet.id)
-                    self.get_all_replies(tweet, self.api, self.fout_stream, Verbose=config.Verbose)
+                        self.get_all_replies(tweet, self.api, self.fout_stream, Verbose=config.Verbose)
                     
                 
+                # else: we decided to fetch only replies containing target words
+                else: 
+                    if self._is_reply(data_status): #and self._worth_to_follow(data_status,
+                                                                              #config.query_replies):
+                        if config.Verbose:
+                            print('Conversation found with target word in a reply!' )
+                        tweet = self._find_source(data_status)
+                        self.get_all_replies(tweet, self.api, self.fout_stream, Verbose=config.Verbose)
+             
                 self.time_to_go = self.new_time_to_go
                 return True
-                
-                
+            
+            
             except BaseException as e:
                 sys.stderr.write("Error on_data: {}\n".format(e))
                 self.time_to_go = self.new_time_to_go
@@ -192,7 +204,7 @@ class myListener(tweepy.StreamListener):
                              
         return False
 
-    
+
     
     def on_error(self, status):
         # The on_error() method in particular will deal with explicit errors from Twitter
@@ -265,9 +277,12 @@ class myListener(tweepy.StreamListener):
         """ If a tweet is a reply, find the origin of the conversation"""
         original_tw = self.api.get_status(tweet.in_reply_to_status_id)
         if original_tw.in_reply_to_status_id == None:
-            return original_tw
+            tweet = original_tw
         else:
-            return self._find_source(original_tw)
+            tweet = self._find_source(original_tw)       
+        with open(self.fout_stream, 'a') as f:
+            f.write(json.dumps(tweet._json)+'\n')
+        return tweet
 
 
     
@@ -340,10 +355,13 @@ def main():
     my_stream = tweepy.Stream(my_auth, 
                               myListener(api = my_api, time_limit = config.time_limit, 
                                          get_user_tweets = config.get_user_tweets,
-                                        follow_conversations = config.follow_conversations))
+                                        follow_conversations = config.follow_conversations,
+                                        replies_only = self.replies_only))
                              
-    
-    my_stream.filter(track = config.query, languages = config.languages, async=True)
+    if config.replies_only:
+        my_stream.filter(track = config.query_replies, languages = config.languages, async=True)
+    else:
+        my_stream.filter(track = config.query, languages = config.languages, async=True)
 
         
     
