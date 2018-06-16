@@ -17,9 +17,6 @@ import seaborn as sns
 
 
 
-
-
-
 def tweet_cleaner(text, my_dict):
         
     # fixes encoding problem (MICHELE)
@@ -44,9 +41,10 @@ def tweet_cleaner(text, my_dict):
     text = unidecode.unidecode(text)
     soup = BeautifulSoup(text, 'lxml')
     souped = soup.get_text()
+    lower = souped.lower()
     
     for word in my_dict:
-        souped = re.sub(word, my_dict[word], souped)
+        souped = re.sub(word, my_dict[word], lower)
     
     try:
         bom_removed = souped.decode("utf-8-sig").replace(u"\ufffd", "?")
@@ -79,7 +77,7 @@ def generate_stopwords():
     stopwords_en = nltk.corpus.stopwords.words("english")
     stopwords_fr = nltk.corpus.stopwords.words("french")
     stop_words = stopwords_en+stopwords_fr
-    #other_exclusions = ["#ff", "ff", "rt"]
+    other_exclusions = ["les"]
     #stop_words.extend(other_exclusions)
     return stop_words
 
@@ -89,7 +87,7 @@ def remove_stopwords(text_list, sw):
 
 my_dict={"aujourd'hui":"aujourdhui", "s'il":"si il", "s'":"se ","n'":"ne ", 'jte':"je te", 'pck':'parce que', 'jms':'jamais',
         'fdp': 'fis de pute', 'ptn': 'putaine', 'pcq':'parce que', 'tt ': 'toute', 'vrmt': 'vraiment',
-         "m'a'": 'me a','ptdr':" plie tordu de rire", "c'est":"ce est","m'":"me ", "jrnee":"jourrnee",'pxtain': 'putaine', 'bz':'baisez'}
+         "m'a'": 'me a','ptdr':" plie tordu de rire", "c'est":"ce est","m'":"me ", "jrnee":"jourrnee",'pxtain': 'putaine', 'bz':'baisez', "j'":"je ", "qu'":"que "}
 
 
 
