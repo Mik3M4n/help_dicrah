@@ -10,7 +10,7 @@ import numpy as np
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import sys
 
 
 
@@ -20,11 +20,12 @@ import seaborn as sns
 def tweet_cleaner(text, my_dict):
         
     # fixes encoding problem (MICHELE)
-    if type(text)!=unicode and type(text)!=float:
-        try: 
-            text= unicode(text,'utf-8')
-        except UnicodeDecodeError: 
-            text= unicode(text,'latin-1')
+    if sys.version_info[0] < 3:
+        if type(text)!=unicode and type(text)!=float:
+            try: 
+                text= unicode(text,'utf-8')
+            except UnicodeDecodeError: 
+                text= unicode(text,'latin-1')
     if type(text)==float:
         text = str(text)
     
@@ -163,7 +164,7 @@ class TfidfEmbeddingVectorizer(object):
     def __init__(self, word2vec):
         self.word2vec = word2vec
         self.word2weight = None
-        self.dim = len(word2vec.itervalues().next())
+        self.dim = len(list(self.word2vec.values())[1])
 
     def fit(self, X):
         tfidf = TfidfVectorizer()
