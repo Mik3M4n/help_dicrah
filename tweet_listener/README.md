@@ -1,33 +1,48 @@
-##################### Docs for stream_listener.py -- see also config.py ####################
 
-The code launches a twitter streaming with different options. To set parameters and select the running mode, please edit the config.py file where explanation is provided. Do not edit the code in stream_listener.py unless you want to extend it.
+############################################
+stream_listener
+############################################
 
-The output will be in te folder(s) Streams, Replies, and Users, under your current directory. For details about settings see config.py
+
+
+stream_listener.py is a code to scrap twitter. It launches a streaming filtered by different options, explained below.
+
+ To set parameters and select the running mode, please edit the config.py file where explanation is provided. Do not edit the code in stream_listener.py unless you want to extend it.
+
+The output will be in te folder(s) Streams,and Users, under your current directory. For details about settings and name of the output files, see config.py
 
 A summary of the available options (with the corresponding variables' values, to be set in config.py) is provided here.
 
-The two main modes are: (1) look for tweets filtered by a query word list, (2) look for replies containing words in a query word list and analyse the corresponding conversation, or (3) predict their sentiment ('hateful/racist' or 'neutral') according to a ML classifier provided as input. In case (1), you can also choose the option of looking for replies.
+The options are: (1) look for tweets filtered by a query word list, (2) look for replies containing words in a query word list and analyse the corresponding conversation, or (3) predict their sentiment ('hateful/racist' or 'neutral') according to a ML classifier provided as input. In case (1), you can also choose the option of looking for replies.
+
+
+Here we provide a more detailed explanation of the three options, and the values of the corresponding parameters to set in config.py
 
 (1) Look for target words in ALL INCOMING TWEETS:
 
 A: save all
-- replies_only = False - save_data = True
+   - replies_only = False
+   - save_data = True
 
 B : if you want to also save the first n_tweets for each of the first n_pages of each user’s timeline:
 
-self.get_user_tweets = True
+  - self.get_user_tweets = True
 
-set n_tweets_user and n_pages_user to the desired value
+  - set n_tweets_user and n_pages_user to the desired value
 
-C: if you want to also track the conversation: - follow_conversations = True
+C: if you want to also track the conversation: 
+   - follow_conversations = True
 
 in this case, for each tweet the listener will check if the tweet is a reply (or has replies), fetch the origin of the conversation and save the tweets.
+
+
 (2) if you want to look for target words in REPLIES ONLY:
 
 save_data = True
 if you only want to save the origin of the conversation: origin_only=True
 query words are set in the variable query_replies
 For both points 1 and 2, you can set also the max depth of a conversation, i.e. the maximun number of replies to fetch, in the variable max_depth.
+
 
 (3) If you want to PREDICT the sentiment of incoming tweets:
 
@@ -40,8 +55,8 @@ All the queries are saved in .jsonl format (one tweet per line in json format)
 
 ################# NOTES AND IMPROVEMENTS #################
 
-The option of following conversation works, but it may be inefficients in terms of time and handling of Twitter API rate limits. This may become a problem if following very popular hashtag/very active conversations/very active prophiles .Consider this elements before using it blindly !
+ - The option of following conversation works, but it may be inefficients in terms of time and handling of Twitter API rate limits. This may become a problem if following very popular hashtag/very active conversations/very active prophiles .Consider this elements before using it blindly !
 
-The output of label predictions is for the moment only an alert printed on the terminal. This may be improved.
+ - The output of label predictions is for the moment only an alert printed on the terminal. This may be improved.
 
-Handle check of input variables
+ - Handle check of input variables

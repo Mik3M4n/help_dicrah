@@ -1,5 +1,3 @@
-  #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Mon May 14 09:30:52 2018
 
@@ -7,108 +5,99 @@ Created on Mon May 14 09:30:52 2018
 @contributors: Alex, Ed
 """
 
-#################################################
-#################################################
 
-# Configuration file for the code 'StreamListener_mm.py'
+############################################
+# Configuration file for stream_listener
+############################################
 
-#################################################
-#################################################
+# Please note that the code does not yet supply a check of the correctness of the input variables' format
+# So, to avoid errors, please be careful to give to all variables valid values.
 
-
-######
-# VARIABLES GLOBALES
-######
+############################################
 
 
-# Gestion des fichiers locaux
-credentialsFile = 'Credentials1.csv'
-# Modif. tirée du code d'Alex, pour ne pas montrer les credentials
-# sur le fichier et les rendre publiques sur GitHub. Il faut garder le
-# fichier 'Credentials.csv' sur la machine locale et ne pas push sur GitHub (Ed)
+# Get twitter credentials. The credentials must be in the file Credentials.csv in the order:
+# CONSUMER_KEY
+# CONSUMER_SECRET
+# ACCESS_TOKEN
+# ACCESS_TOKEN_SECRET
 
-
-
-######
-# Récupération des credentials twitter
-######
-credentials = open(credentialsFile, 'r') 
+credentialsFile = 'Credentials2.csv'
+credentials = open(credentialsFile, 'r')
 CONSUMER_KEY = credentials.readline().strip()
 CONSUMER_SECRET = credentials.readline().strip()
 ACCESS_TOKEN = credentials.readline().strip()
 ACCESS_TOKEN_SECRET = credentials.readline().strip()
 credentials.close()
 
+# Name of the output file of the query. This will be in the directory Streams/
+query_fname = 'prova_25'
 
-
-
-######
-#  Input parameters - edit these !
-######
-
-
-# Query name
-query_fname = 'prova_8jun' # Name of the output jsonl file in the folder Streams/
-
-
-
-#  If true, the code will print some updates while running
+# Print updates while running
 Verbose = True
 
-
-#  hashtags or keywords to filter the stream. Must be a list of strings
-# Liste proposée à partir du dictionnaire termes bannis Android et quelque
-# hashtags populaires sur racisme. Elle peut être modifiée à tout moment,
-# car les nouvelles recherches font un append sur les données déjà scrappées (Ed)
-
-query_file='query_words.txt'
-
+# File where the query words are stored. In case of a simple query (e.g.) an hasthag,
+# this can be entered directly in the form of a list, e.g. query = ['<your_hashtag>']
+# Must be a list of strings
+query_file = 'query_words.txt'
 query = []
-with open(query_file, "r") as f:
+with open(query_file, 'r') as (f):
     for line in f:
-        query.append(line.decode('utf-8'))
-import random
-max_words = 100
-query = [ query[i] for i in sorted(random.sample(xrange(len(query)), max_words)) ]
+        query.append(line)
 
-query_replies=['#Racisme','#RacismeOrdinaire', 'raciste', 'dilcrah', 'pharos', 'balancetonraciste', 'balancetonracisme']
+        
+# Language
+languages = [ 'fr']
 
-
-# Language to filter the stream.
-languages = ['fr'] # ex. ['fr']
-
-#  Time limit in seconds.  Must be an integer or None if you don't want any 
-time_limit = 350 # an int or None 
+#  Time limit in seconds.  Must be an integer or None if you don't want any
+time_limit = 45000
 
 
-
-# If follow_conversations = True, the code will check if a tweet is a reply; if so, it will retrieve the conversation
-#
-# max_tweets_conv is the max number of tweets fetched 
-
+# If tweets are replies, fetch the entire conversation
 follow_conversations = False
 
 
-# If replies_only=True, the code will check if an incoming tweet is a reply containing any of the words in query_replies; only in this case it saves the tweet
+# If fetches conversations, we can choose to get only the tweet in reply to, or
+# to look for query wrds in reply only, and the max number of replies 
+replies_only = False
+origin_only = False
+max_depth = 10
+# Query words to look in replies 
+query_replies = ['#Racisme', '#RacismeOrdinaire', 'raciste', 'dilcrah', 'pharos', 'balancetonraciste', 'balancetonracisme', 'sioniste']
 
-replies_only = True
 
 
-
-# if get_user_tweets = True, the code will save the first n_tweets
-# of the first n_pages of each new user's timeline.
+# Look for teh first n_tweets_user in the first n_pages_user for each user found.
+# Output will be in the folder Users/ in the format:
+# user_timeline_<username>.jsonl
 
 get_user_tweets = False
-n_tweets_user=20
-n_pages_user=1
+n_tweets_user = 300
+n_pages_user = 5
+
+
+
+# Machine learning: predict the content of the tweet: 0 for racist/hateful, 1 for neutral 
+# We can choose to save predictions in the query file
+# The label will be contained in an additional field in the tweet dict in json format, called 'Predicted_label'
+# e.g. tweet['Predicted_label']
+
+
+predict_tweet = True
+save_predictions = True
+my_classifier = '../machine_learning/finalized_model_fr.pk'
+my_vectorizer = '../machine_learning/my_vectorizer.pk'
+
+# geographical area where to launch the query if asking for predictions ([ -180, -90, 180, 90] is the entire world)
+GEOBOX = [ -180, -90, 180, 90]
 
 
 
 
 
-#####
+############################################
 # Example of output
-#####
+############################################
 
 # query_fname = 'ex_query'
 # data_dir = my_dir/
@@ -124,4 +113,3 @@ n_pages_user=1
 # - a file 'Users/user_timeline_<username>.jsonl' for every different <usename> that tweeted about your query.
 #   In this case we collected 50 tweets * 4 pages  = 200 tweets for each user.
 # - a file 'Users/stream_ex_query_users_list.txt' with a list of the usernames whose tweets we collected
-
