@@ -38,7 +38,6 @@ if sys.version_info[0] < 3:
     import pickle
 else:
     import dill as pickle
-    #import cPickle as pickle
 
 sys.path.insert(0, '../machine_learning')
 from help_dicrah_functions import *
@@ -192,9 +191,9 @@ class myListener(tweepy.StreamListener):
                                 print ('!!!!! Suspect tweet found !!!!!')
                                 print ('Text: %s' % data_status.text)
                                 print ('Predicted label: %s' % pred)
-                            if pred == 1:
-                                print ('Text: %s' % data_status.text)
-                                print ('Predicted label: %s' % pred)
+                            #if pred == 1:
+                            #    print ('Text: %s' % data_status.text)
+                            #    print ('Predicted label: %s' % pred)
                             if self.save_predictions:
                                 tweet_with_label = data_status
                                 tweet_with_label._json[u'Predicted_label'] = int(pred[0])
@@ -367,8 +366,14 @@ class myListener(tweepy.StreamListener):
                 
                 
 def main():
+    
+    
+    # Get auth and API
     my_auth = get_auth()
     my_api = get_api(my_auth)
+    
+    
+    # Print a summary of the query
     if config.Verbose:
         print ('-----')
         if config.query != []:
@@ -393,6 +398,7 @@ def main():
         if config.predict_tweet:
             print ('Predicting labels for tweets.... \n Estimator:')
    
+    # Set the streaming
     my_stream = tweepy.Stream(my_auth, 
                               myListener(api = my_api, 
                                          time_limit = config.time_limit, 
@@ -404,6 +410,8 @@ def main():
                                          predict_tweet = config.predict_tweet,
                                          save_predictions = config.save_predictions), 
                               tweet_mode='extended', full_text=True)
+    
+    # Filter according to the query requested
     if not config.predict_tweet:
         if config.replies_only:
             my_stream.filter(track=config.query_replies, 
@@ -416,8 +424,7 @@ def main():
                              async=True,
                              stall_warnings=True)
     else:
-        my_stream.filter(#locations=config.GEOBOX,
-                         track=config.query_replies,
+        my_stream.filter(locations=config.GEOBOX,
                          languages=config.languages, 
                          async=True, 
                          stall_warnings=True)

@@ -33,25 +33,32 @@ B : if you want to also save the first n_tweets for each of the first n_pages of
 C: if you want to also track the conversation: 
    - follow_conversations = True
 
-in this case, for each tweet the listener will check if the tweet is a reply (or has replies), fetch the origin of the conversation and save the tweets.
+   - In this case, for each tweet the listener will check if the tweet is a reply (or has replies), fetch the origin of the conversation and save the tweets.
 
 
 (2) if you want to look for target words in REPLIES ONLY:
 
-save_data = True
-if you only want to save the origin of the conversation: origin_only=True
-query words are set in the variable query_replies
+- save_data = True
+- if you only want to save the origin of the conversation: origin_only=True
+- query words are set in the variable query_replies
+
+
 For both points 1 and 2, you can set also the max depth of a conversation, i.e. the maximun number of replies to fetch, in the variable max_depth.
 
 
 (3) If you want to PREDICT the sentiment of incoming tweets:
 
-predict_tweet = True
-input the geographical zone where you want to look for tweets in the variable GEOBOX in config.py
-choose whether to save data with save_data
-choose whether to save predictions with save_predictions. In this case, the output will be the same format as point (1) but with an additional field for the predicted label.
-The code will print alerts for "suspects" tweets.
+- predict_tweet = True
+- input the geographical zone where you want to look for tweets in the variable GEOBOX in config.py
+- choose whether to save data with save_data
+- choose whether to save predictions with save_predictions. In this case, the output will be the same format as point (1) but with an additional field for the predicted label.
+- The code will print alerts for "suspects" tweets.
+
+
 All the queries are saved in .jsonl format (one tweet per line in json format)
+
+
+
 
 ################# NOTES AND IMPROVEMENTS #################
 
@@ -60,3 +67,14 @@ All the queries are saved in .jsonl format (one tweet per line in json format)
  - The output of label predictions is for the moment only an alert printed on the terminal. This may be improved.
 
  - Handle check of input variables
+
+
+
+
+####### References:
+
+-  https://media.readthedocs.org/pdf/tweepy/latest/tweepy.pdf
+ -  http://ebook.pldworld.com/_eBook/-Packt%20Publishing%20Limited-/9781783552016-MASTERING_SOCIAL_MEDIA_MINING_WITH_PYTHON.pdf
+ -  http://stats.seandolinar.com/collecting-twitter-data-using-a-python-stream-listener/ 
+ -  https://github.com/tweepy/tweepy/blob/78d2883a922fa5232e8cdfab0c272c24b8ce37c4/tweepy/streaming.py
+
