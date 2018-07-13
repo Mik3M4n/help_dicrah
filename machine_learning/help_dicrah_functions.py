@@ -17,7 +17,7 @@ import sys
 
 
 
-def tweet_cleaner(text, my_dict):
+def tweet_cleaner(text, my_dict, stem = False):
         
     # fixes encoding problem (MICHELE)
     if sys.version_info[0] < 3:
@@ -28,6 +28,11 @@ def tweet_cleaner(text, my_dict):
                 text= unicode(text,'latin-1')
     if type(text)==float:
         text = str(text)
+    
+    if stem:
+        stemmer = FrenchStemmer()
+        tokens = [stemmer.stem(t) for t in text.split() if len(stemmer.stem(t))>=1]
+        text = " ".join(tokens)
     
     tok = WordPunctTokenizer()
 
@@ -64,13 +69,10 @@ def tweet_cleaner(text, my_dict):
     return (" ".join(words)).strip()
 
 
-def tokenize(text, stem=False):
+
+def tokenize(text):
     tweet = " ".join(re.split("[^a-zA-Z]*", text.lower())).strip()
-    if stem:
-        stemmer = FrenchStemmer()
-        tokens = [stemmer.stem(t) for t in tweet.split() if len(stemmer.stem(t))>2 ]
-    tokens = tweet.split(' ')
-    return tokens
+    return tweet.split(' ')
 
 
 
@@ -156,9 +158,25 @@ def print_cm(y_test,y_preds, names):
 
 
 
+class MeanEmbeddingVectorizer(object):
+    def __init__(self, word2vec):
+        self.word2vec = word2vec
+        # if a text is empty we should return a vector of zeros
+        # with the same dimensionality as all the other vectors
+        self.dim = len(list(self.word2vec.values())[1])
+
+    def fit(self, X, y):
+        return self
+
+    def transform(self, X):
+        return np.array([
+            np.mean([self.word2vec[w] for w in words if w in self.word2vec]
+                    or [np.zeros(self.dim)], axis=0)
+            for words in X
+        ])
 
 
-
+    
 class TfidfEmbeddingVectorizer(object):
     
     def __init__(self, word2vec):
@@ -166,12 +184,17 @@ class TfidfEmbeddingVectorizer(object):
         self.word2weight = None
         self.dim = len(list(self.word2vec.values())[1])
 
-    def fit(self, X):
-        tfidf = TfidfVectorizer()
+    def fit(self, X, stem=False, rem_sw = False):
+        if not rem_sw:
+            tfidf = TfidfVectorizer(tokenizer =  lambda x: tokenize(x),
+                                preprocessor =  lambda x: tweet_cleaner(x, my_dict, stem=stem),
+                                use_idf = True)
+        else:
+            tfidf = TfidfVectorizer(tokenizer =  lambda x: tokenize(x),
+                                preprocessor =  lambda x: tweet_cleaner(x, my_dict, stem=stem),
+                                use_idf = True,
+                                stop_words=generate_stopwords())
         tfidf.fit(X)
-        # if a word was never seen - it must be at least as infrequent
-        # as any of the known words - so the default idf is the max of 
-        # known idf's
         max_idf = max(tfidf.idf_)
         print(max_idf)
         self.word2weight = defaultdict(
@@ -192,22 +215,33 @@ class TfidfEmbeddingVectorizer(object):
 
 
 
-def get_tfidf_frequencies(data):
+def get_tfidf_frequencies(data, 
+                          stem=True, 
+                          remove_stopwords=True,
+                          ngram_range = (1,3), 
+                          n_features = 1000 ):
+    
+    
+    params={'sublinear_tf':True, 
+            'tokenizer': lambda x: tokenize(x),
+            'preprocessor' : lambda x: tweet_cleaner(x, my_dict, stem=stem),
+            'ngram_range' : ngram_range,
+            'use_idf':True,
+            'smooth_idf':False,
+            'norm':None,
+            'decode_error':'replace',
+            'max_features': n_features,
+            'min_df':5,
+            'max_df':0.75}
+        
+    if remove_stopwords:
+            # Note: Equivalent to CountVectorizer followed by TfidfTransformer
+        tfidf = TfidfVectorizer(**params,
+                                 stop_words=generate_stopwords())
 
-    # Note: Equivalent to CountVectorizer followed by TfidfTransformer
-    tfidf = TfidfVectorizer(sublinear_tf=True, 
-                            tokenizer=lambda x: tokenize(x, stem=False),
-                            preprocessor=lambda x: tweet_cleaner(x, my_dict),
-                            ngram_range=(1, 3),
-                            use_idf=True,
-                            smooth_idf=False,
-                            norm=None,
-                            decode_error='replace',
-                            max_features=10000,
-                            min_df=5,
-                            max_df=0.75,
-                            stop_words=generate_stopwords())
-
+    else:
+        tfidf = TfidfVectorizer(**params)
+       
     features = tfidf.fit_transform(data).toarray()
     sum_words = features.sum(axis=0)
     words_freq ={word: sum_words[idx] for word,idx in tfidf.vocabulary_.items()}
