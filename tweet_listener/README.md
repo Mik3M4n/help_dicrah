@@ -1,15 +1,20 @@
 
-############################################
-stream_listener
-############################################
+# STREAM LISTENER
 
 
 
-stream_listener.py is a code to scrap twitter. It launches a streaming filtered by different options, explained below.
+## Description
 
- To set parameters and select the running mode, please edit the config.py file where explanation is provided. Do not edit the code in stream_listener.py unless you want to extend it.
+stream_listener.py is a code to scrape twitter. It launches a streaming filtered by different options, including query words and prediction of sentiment based on a pre-trained classifier.
+Details are explained below.
+The language is French. 
 
-The output will be in te folder(s) Streams,and Users, under your current directory. For details about settings and name of the output files, see config.py
+DISCLAIMER: the pre-trained models for sentiment analysis do not fit the GitHub repo. We could provide them to anyone interested upon request. 
+
+## Running and options
+
+To set parameters and select the running mode, please edit the config.py file where explanation is provided. Do not edit the code in stream_listener.py unless you want to extend it.
+
 
 A summary of the available options (with the corresponding variables' values, to be set in config.py) is provided here.
 
@@ -55,26 +60,31 @@ For both points 1 and 2, you can set also the max depth of a conversation, i.e. 
 - The code will print alerts for "suspects" tweets.
 
 
+
+
+## Output
+
+The output will be in the folder(s) Streams,and Users, under your current directory. For details about settings and name of the output files, see config.py
+
 All the queries are saved in .jsonl format (one tweet per line in json format)
 
 
 
+## Notes and improvements
 
-################# NOTES AND IMPROVEMENTS #################
+* The option of following conversation works, but it may be inefficients in terms of time and handling of Twitter API rate limits. This may become a problem if following very popular hashtag/very active conversations/very active prophiles .Consider this elements before using it blindly !
 
- - The option of following conversation works, but it may be inefficients in terms of time and handling of Twitter API rate limits. This may become a problem if following very popular hashtag/very active conversations/very active prophiles .Consider this elements before using it blindly !
+* The output of label predictions is for the moment only an alert printed on the terminal. This may be improved.
 
- - The output of label predictions is for the moment only an alert printed on the terminal. This may be improved.
-
- - Handle check of input variables
-
+* Handle check of input variables
 
 
 
-####### References:
 
--  https://media.readthedocs.org/pdf/tweepy/latest/tweepy.pdf
- -  http://ebook.pldworld.com/_eBook/-Packt%20Publishing%20Limited-/9781783552016-MASTERING_SOCIAL_MEDIA_MINING_WITH_PYTHON.pdf
- -  http://stats.seandolinar.com/collecting-twitter-data-using-a-python-stream-listener/ 
- -  https://github.com/tweepy/tweepy/blob/78d2883a922fa5232e8cdfab0c272c24b8ce37c4/tweepy/streaming.py
+## References:
+
+*  https://media.readthedocs.org/pdf/tweepy/latest/tweepy.pdf
+*  http://ebook.pldworld.com/_eBook/-Packt%20Publishing%20Limited-/9781783552016-MASTERING_SOCIAL_MEDIA_MINING_WITH_PYTHON.pdf
+*  http://stats.seandolinar.com/collecting-twitter-data-using-a-python-stream-listener/ 
+*  https://github.com/tweepy/tweepy/blob/78d2883a922fa5232e8cdfab0c272c24b8ce37c4/tweepy/streaming.py
 
