@@ -31,7 +31,7 @@ We also thought that, especally with a small dataset and with little time to col
 A way to go around this problem could be to collect a large amounts of tweets for a long period of time, and then work only on a randomly selected subsample, large enough to be various in lexical features. This is also a good way to avoid another bias due to the structure of twitter, that is strongly related to hashtags and trending topics. In our case, we couldn't afford such a long procedure due to our time limitations.
 So, we came up with a second way to collect data, namely, **we launched a query that searched from specifis terms in replies** to tweets, such as "racist", "homophobic" etc. , with the idea that these replies might be addressed to "suspect" tweets (Of the type "@someone: what you said is definitely racist!"). Then, our code fetched the entire conversation with a recursive call. 
 
-![get_all_replies](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/get_all_replies.png) 
+![get_all_replies](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/get_all_replies.png) 
 
 The query can be launched using the code stream_listener.py in the folder tweet_listener. 
 
@@ -66,7 +66,7 @@ Then, we tried two different approaches:
 
 This choice is motivated by the fact that we wanted to ascertain whether removing stopwords and stemming influences the features by changing the context of a word. For example, the expression "I'm not racist, but...", often associated with racist content, would become just "racist" after removing stopwords. An example is given below.
 
-![stemming](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/stemming.png) 
+![stemming](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/stemming.png) 
 
 
 
@@ -96,21 +96,21 @@ We also tried using features without stemming and keeping stopwords, but this re
 ### Results
 
 #### 1. TFIDF
-![tfidf](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/tfidf.png) 
+![tfidf](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/tfidf.png) 
 
 #### 2. Unweighted w2v
-![unweighted_w2v](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/unweighted_w2v.png) 
+![unweighted_w2v](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/unweighted_w2v.png) 
 
 #### 3. Weighted w2v, full dataset
-![weighted_w2v](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/weighted_w2v.png) 
+![weighted_w2v](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/weighted_w2v.png) 
 
 #### 4. Weighted w2v, selected dataset
-![weighted_w2v_selected](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/weighted_w2v_selected.png) 
+![weighted_w2v_selected](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/weighted_w2v_selected.png) 
 
 #### 5. Undersampling
 Finally, as the two label classes were highly unbalanced, we tried to train the classifier on a balanced sample. This is done with a random undersampling. The resulting dataset is small (544 tweets in each class)
 
-![Undersampling](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/undersampling.png) 
+![Undersampling](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/undersampling.png) 
 
 
 
@@ -133,7 +133,7 @@ Finally, using undersampling techniques may improve the performace, in particula
 ## Using the twitter API
 The best model can be integrated in the stream. We mad this option available in the code stream_listener.py . Refer to the docs in the folder tweet_listener for usage. 
 
-![Sentiment](https://github.com/charlessutton/help_dicrah/blob/machine_learning/pics/predict_sentiment.png) 
+![Sentiment](https://github.com/Mik3M4n/help_dicrah/tree/master/pics/predict_sentiment.png) 
 
 In this base version, the code prints an alert on standard output and saves tweets with the corresponding prediction. It can easily be extended to more complex tasks (e.g. automatically replying).
 
