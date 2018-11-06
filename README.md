@@ -12,7 +12,7 @@ So, the problem can be divided in three steps:
  * Develop and train a ML algorithm (folder machine_learning)
  * Integrate in the twitter API (folder tweet_listener)
 
-Being our project limited to less than two months, we shall not provide the definitive dataset or classifier here: as we will see, the data and models can and should be improced for a variety of reasons that we will explain. However, all the tools to expand our base model are available and documented and **we provide a complete pipeline, from data collection to the final product: an online tool to detect hate speech during a Twitter stream **.
+Being our project limited to less than two months, we shall not provide the definitive dataset or classifier here: as we will see, the data and models can and should be improced for a variety of reasons that we will explain. However, all the tools to expand our base model are available and documented and **we provide a complete pipeline, from data collection to the final product: an online tool to detect hate speech during a Twitter stream**.
 
 The docs for the different parts of this project can be found in the relative folders.
 
