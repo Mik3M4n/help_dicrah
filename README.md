@@ -1,4 +1,4 @@
-# Help_dicrah: a hate speech detection tool on Twitter (in French)
+# Help_dilcrah: a hate speech detection tool on Twitter (in French)
 
 Hate speech detection on social networks is a widely studied problem at the intersection of different domains. It can be approached from multiple point of views, such as linguistical, political, sociological, and so on. It is also an interesting Machine Learning problem. 
 Recently, the French governmental agency DILCRAH (Délégation Interministérielle à la Lutte Contre le Racisme, l'Antisémitisme et la Haine anti-LGBT) launched a [plan](https://www.gouvernement.fr/plan-national-de-lutte-contre-le-racisme-et-l-antisemitisme-2018-2020) to fight racism, with a focus on social networks. Having being released more or less at the same time as our Data Science intensive program happened, we thought we could take inspiration for our final project and contribute with our work to the public interest. So we decided to develop a **supervised classifier for hate speech detection on Twitter in French**.
